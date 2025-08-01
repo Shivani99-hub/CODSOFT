@@ -1,0 +1,66 @@
+
+import pandas as pd
+
+# Update the path to where your file is located
+file_path = r"c:\Users\shiva\Downloads\advertising.csv"
+data = pd.read_csv(file_path)
+
+# Drop unnecessary columns if present
+if 'Unnamed: 0' in data.columns:
+    data = data.drop(columns=['Unnamed: 0'])
+
+# Preview the data
+print(data.head())
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Check for missing values
+print(data.isnull().sum())
+
+# Summary statistics
+print(data.describe())
+
+# Visualize relationships
+sns.pairplot(data, x_vars=['TV', 'Radio', 'Newspaper'], y_vars='Sales', height=4, aspect=1)
+plt.show()
+
+# Correlation heatmap
+sns.heatmap(data.corr(), annot=True, cmap='coolwarm')
+plt.title("Feature Correlation")
+plt.show()
+
+from sklearn.model_selection import train_test_split
+
+# Define features and target
+X = data[['TV', 'Radio', 'Newspaper']]
+y = data['Sales']
+
+# Split into training and test sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+from sklearn.linear_model import LinearRegression
+
+# Initialize and train the model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Predict on test data
+y_pred = model.predict(X_test)
+
+from sklearn.metrics import mean_squared_error, r2_score
+
+# Evaluation metrics
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print(f"Mean Squared Error: {mse:.2f}")
+print(f"R² Score: {r2:.2f}")
+
+# Actual vs Predicted
+plt.scatter(y_test, y_pred)
+plt.xlabel("Actual Sales")
+plt.ylabel("Predicted Sales")
+plt.title("Actual vs Predicted Sales")
+plt.plot([y.min(), y.max()], [y.min(), y.max()], 'k--', lw=2)
+plt.show()
